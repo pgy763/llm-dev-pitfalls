@@ -1,0 +1,87 @@
+# `model_not_found`：模型名少了版本后缀
+
+## 报错
+
+```
+openai.NotFoundError: Error code: 404 -
+{'error': {'message': 'The model `qwen3.8-max` does not exist or you do not
+           have access to it.', 'type': 'invalid_request_error',
+           'code': 'model_not_found'}}
+```
+
+你代码里写的模型名是官方文档上的名字，但服务端说不存在。
+
+## 为什么
+
+**文档上的模型名通常是「别名」，而别名会随版本更新变化。**
+
+各家平台普遍提供两种模型名：
+
+| 类型 | 例子 | 特点 |
+| --- | --- | --- |
+| 别名（无版本号） | `qwen-plus`、`glm-4-plus` | 指向最新版本，方便但会漂移 |
+| 快照（带版本后缀） | `qwen3.8-max-0902`、`gpt-4o-2024-08-06` | 锁定版本，稳定但名字长 |
+
+问题出在**有些平台的别名会临时失效、或者只在某些分组下可用**。你在教程里抄到的 `qwen3.8-max`，可能当时是别名，现在必须带后缀 `-0902` 才认。
+
+另外还有一种情况：模型名本身是对的，但**你的账号没有该模型的权限**（没开通、额度不够、分组不对）。报错信息是同一句，后半句 `or you do not have access to it` 就是在说这个。
+
+## 怎么改
+
+**第一步：不要猜，直接问平台有哪些模型。**
+
+```bash
+curl https://dashscope.aliyuncs.com/compatible-mode/v1/models \
+     -H "Authorization: Bearer $DASHSCOPE_API_KEY" | python -m json.tool
+```
+
+返回的 `data[].id` 列表就是你能用的全部模型名。**把这个列表复制下来，从里面挑**，不要从文档或教程里抄。
+
+用代码查也行：
+
+```python
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
+for m in client.models.list().data:
+    print(m.id)
+```
+
+**第二步：如果列表里有你写的模型，但调用还是 404** → 是权限/分组问题，去控制台开通对应的模型。
+
+**第三步：拿到正确名字后写进 `.env`，不要硬编码在代码里。**
+
+```bash
+# .env
+QWEN_MODEL=qwen-plus
+```
+
+```python
+model=os.getenv("QWEN_MODEL")
+```
+
+这样平台改名时你只改配置。**这一点很重要**：平台下线别名是常事，硬编码意味着每次都要改代码重新部署。
+
+## 怎么预防
+
+**模型名是「运行时配置」，不是「代码常量」。**
+
+三条规则：
+
+1. **首选带版本后缀的快照名**（如果要稳定性），或**选一个不常变的主流别名**（如果要省事），不要用冷门别名
+2. **一切模型名进 `.env`**，代码里只读环境变量
+3. **项目里加一个启动自检**：启动时调一次 `/models`，确认配置的模型在列表里，不在就立刻报错退出——比跑到一半才 failed 好得多
+
+还有一个小提示：`model_not_found` 和「模型名拼错」的报错长得一样。所以先确认拼写（尤其是 `-` 和 `.` 的区别、`plus`/`max`/`turbo` 的后缀），再去查权限。
+
+## 环境
+
+| 组件 | 版本 |
+| --- | --- |
+| Python | 3.13 |
+| langchain-openai | 1.x |
+| 涉及提供方 | 阿里云百炼 / 智谱 / OpenAI 兼容接口 |

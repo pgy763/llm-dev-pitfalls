@@ -1,0 +1,115 @@
+# `string indices must be integers` —— 把列表当字典用了
+
+## 报错
+
+```
+TypeError: string indices must be integers, not 'str'
+```
+
+出现在类似 `result["name"]` 或 `df["column"]` 的位置。
+
+## 为什么
+
+你的变量是个**列表**（或者字符串），但你用了字典的取法。
+
+最典型的场景：**调用一个方法，凭经验猜错了返回类型。**
+
+```python
+tables = db_manager.get_table_names()
+print(tables["students"])     # 错：报 TypeError
+```
+
+`get_table_names()` 返回的是 `list[str]`，比如：
+
+```python
+["departments", "students", "teachers"]
+```
+
+对一个列表用字符串下标，Python 会先尝试把它当字典看——发现不是字典，就转而解释为「你在用字符串索引一个序列」，于是抛出 `string indices must be integers`。
+
+**注意报错措辞的误导性**：它说的是「字符串」索引必须是整数，但你手上的明明是列表。这是因为 Python 把「用 `"xxx"` 去索引非字典对象」统一处理成了字符串索引错误。所以报错信息里的「string」指的不是你的变量类型，而是**你用的那个下标**。
+
+同一个坑的另一种表现：
+
+```python
+data = get_something()
+for item in data:
+    print(item["field"])      # 如果 item 是 str 而不是 dict，报同一个错
+```
+
+迭代出来的元素是字符串，却按字典取字段。
+
+## 怎么改
+
+**第一步：先确认返回类型再写取数代码。**
+
+```python
+tables = db_manager.get_table_names()
+print(type(tables))           # <class 'list'>
+print(repr(tables))           # ['departments', 'students', 'teachers']
+```
+
+**第二步：按真实类型写访问代码。**
+
+```python
+# 列表：按下标或直接迭代
+first_table = tables[0]
+for name in tables:
+    print(name)
+
+# 如果确实是字典
+info = {"name": "students", "rows": 120}
+print(info["name"])
+```
+
+**第三步（这个场景的高频需求）：判断某个表在不在列表里。**
+
+```python
+if "students" in tables:
+    schema = db_manager.get_table_schema(["students"])
+```
+
+注意参数要传**列表**，不是字符串——传字符串 `"students"` 会被按字符遍历成 `['s','t','u',...]`，这是另一个同源坑（见下文）。
+
+## 怎么预防
+
+**在写「从返回值里取东西」之前，永远先 `print(type(x))` 一次。**
+
+这条习惯能消灭一大类错误。理由很简单：**你记不住每个库每个方法的返回类型**，尤其是同一个库里 `get_table_names()` 返 `list`、`get_table_schema()` 返 `str` 这种不一致的设计。
+
+顺带记一个**同源坑**，它和上面的错误是一体两面：
+
+```python
+def get_table_schema(self, table_names=None):
+    if table_names is None:
+        table_names = all_tables
+    for name in table_names:          # ← 如果传进来的是字符串 "students"
+        ...                           #   会按字符遍历：'s', 't', 'u', 'd'...
+```
+
+**传字符串不报错，但静默地把每个字符当成一个表名。** 这个比报错更难查，因为程序不崩——只是结果莫名其妙。
+
+防护方式是在函数入口加一道类型校验：
+
+```python
+def get_table_schema(self, table_names=None):
+    if table_names is None:
+        table_names = self.get_table_names()
+    if isinstance(table_names, str):
+        raise TypeError(
+            f"table_names 需要列表，收到字符串 {table_names!r}。"
+            f"是不是想传 [{table_names!r}]？"
+        )
+    for name in table_names:
+        ...
+```
+
+一个 `isinstance` 检查，报错信息还直接告诉你该怎么改。
+
+## 环境
+
+| 组件 | 版本 |
+| --- | --- |
+| Python | 3.13 |
+| SQLAlchemy | 2.x |
+| 复现场景 | 从 LangChain docs 里的 SQL 工具改造 |
