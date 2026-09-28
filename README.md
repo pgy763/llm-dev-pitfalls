@@ -1,9 +1,18 @@
 # LLM 应用开发踩坑手册
 
+![pitfalls](https://img.shields.io/badge/收录踩坑-24_条-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![lang](https://img.shields.io/badge/语言-中文-orange)
+
 > 你在深夜遇到的那些报错，这里可能都记着。
 
-用 LangChain（Python）/ LangChain4j / Spring AI 写 AI 应用时踩过的坑，**按报错关键词索引**。
-不用从头读——把报错信息复制进来，`Ctrl+F` 搜一下就行。
+用 **LangChain / LangGraph / Chroma** 做 AI 应用时踩过的坑，**按报错关键词索引，不按学习顺序**。
+
+不用从头读 —— 把报错信息复制进来，`Ctrl+F` 搜一下就行。
+
+![示例：每条坑都配报错截图](images/pydantic-v2-annotation.png)
+
+*每条坑都带报错截图，一眼就能确认是不是同一个问题。*
 
 ---
 
@@ -11,86 +20,127 @@
 
 大部分教程教你「怎么写对」，这里只记「怎么写错、以及为什么错」。
 
-- **按报错索引，不按学习顺序** —— 你手上只有一条报错，没有章节号
-- **每条坑四段固定结构** —— 报错原文 / 为什么 / 怎么改 / 怎么预防
-- **每条都标了环境版本** —— 大部分坑的根因是版本差异，不标版本等于没写
-- **只收真实踩过的** —— 每条都来自真实调试过程，不是从官方文档里抄的
+| | |
+| --- | --- |
+| **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
+| **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
+| **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错 |
 
 ## 怎么用
 
-1. 把报错信息复制进来，`Ctrl+F` 搜索**最独特的那个词**（比如 `PydanticUserError`、`seacher`），不要搜 `Error` 这种到处都有的词
-2. 找到对应文件，重点看「为什么」和「怎么改」两节
-3. 搜不到？开一个 [Issue](../../issues/new?template=new-pitfall.md) 把报错原文贴上来，我来补
+1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**
+   （比如 `PydanticUserError`、`context_length_exceeded`、`0x80`，别搜 `error`）
+2. 找到对应文件，看「为什么」和「怎么改」
+3. 搜不到？[开个 Issue](https://github.com/pgy763/llm-dev-pitfalls/issues) 把报错贴上来，我来补
+
+---
 
 ## 索引
 
-### 密钥与鉴权
+### 密钥与鉴权 `docs/auth`
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
-| `OpenAIError: The api_key client option must be set` | `.env` 不存在、没加载，或工作目录不对 | [看](docs/auth/openai-error-api-key-not-set.md) |
-| `401 Authentication Fails` | key、URL、客户端、模型名四件套不是同一家 | [看](docs/auth/401-authentication-fails-key-mismatch.md) |
-| `503 分组 default 下无可用渠道` | 中转站的 key 所在分组没有该模型 | [看](docs/auth/upstream-503-no-channel.md) |
+| `The api_key client option must be set` | `.env` 没加载，或工作目录不对 | [看 →](docs/auth/没读到api-key.md) |
+| `401 Authentication Fails` | key、URL、客户端、模型名四件套不是同一家 | [看 →](docs/auth/401密钥串台.md) |
+| `503 分组 default 下无可用渠道` | 中转站的分组里没有这个模型的渠道 | [看 →](docs/auth/中转站没有可用渠道.md) |
+| `429 Rate limit reached` | 循环调用超过套餐 RPM / TPM 上限 | [看 →](docs/auth/429限流.md) |
+| 🔴 `git log -S "sk-"` 有输出 | 密钥进了 git 历史，删掉当前代码也没用 | [看 →](docs/auth/密钥提交进了git历史.md) |
 
-### 接口地址与模型名
-
-| 报错关键词 | 一句话原因 | 文件 |
-| --- | --- | --- |
-| 请求 `404`，URL 看起来完全正确 | `base_url` 写到了 `/chat/completions`，SDK 会自己拼 | [看](docs/endpoint/base-url-404.md) |
-| `model_not_found` / `模型不存在` | 模型名少了版本后缀，或别名已下线 | [看](docs/endpoint/model-not-found.md) |
-
-### 环境与编码
+### 接口与模型 `docs/endpoint`
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
-| `UnicodeDecodeError: 'gbk' codec can't decode` | Windows 下读 `.env`，中文注释 + GBK 编码冲突 | [看](docs/env/gbk-codec-unicodedecodeerror.md) |
-| `invalid literal for int() with base 10: '(3306,)'` | 赋值行多了个尾逗号，变量变成了元组 | [看](docs/env/trailing-comma-tuple.md) |
-| `unexpected keyword argument 'charset '` | URL 参数等号两边有空格 | [看](docs/env/url-param-space.md) |
+| `404 Not Found` | `base_url` 多写了 `/chat/completions`，SDK 会自己拼 | [看 →](docs/endpoint/base-url多写了路径.md) |
+| `model_not_found` | 模型名少了版本后缀，或该账号无权限 | [看 →](docs/endpoint/模型名不存在.md) |
+| `maximum context length is xxx tokens` | 对话历史不裁剪，或 RAG 检索结果塞太多 | [看 →](docs/endpoint/上下文超长.md) |
+| 请求卡住 600 秒才超时 | SDK 默认超时太长，用户干等十分钟 | [看 →](docs/endpoint/请求挂死超时太长.md) |
 
-### Python 与类型
+### 环境与编码 `docs/env`
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
-| `PydanticUserError: Field 'description' defined on a base class was overridden` | pydantic v2 要求覆盖基类字段必须带类型注解 | [看](docs/python/pydantic-v2-field-overridden.md) |
-| `string indices must be integers` | 把返回的 `list[str]` 当成 `dict` 用了 | [看](docs/python/string-indices-must-be-integers.md) |
-| `no attribute 'web_seacher'` | 拼写错误，报错信息里的 `Did you mean` 就是答案 | [看](docs/python/attribute-typo-seacher.md) |
-| `No module named 'my_llm'` | 裸导入在 langgraph 加载方式下失效，要走包路径 | [看](docs/python/no-module-named.md) |
+| `'gbk' codec can't decode byte` | Windows 下 Python 默认 GBK，读不了 UTF-8 的 `.env` | [看 →](docs/env/Windows下gbk编码报错.md) |
+| `invalid literal for int(): (3306,)` | 赋值行多了个尾逗号，值变成了元组 | [看 →](docs/env/多写一个逗号变成元组.md) |
+| `unexpected keyword argument 'charset '` | 连接串里参数名带了空格 | [看 →](docs/env/URL参数不能有空格.md) |
+| 流式输出中文变 `锟斤拷` | 终端或 Python 输出编码不是 UTF-8 | [看 →](docs/env/流式输出中文乱码.md) |
+| `Chroma requires sqlite3 >= 3.35.0` | Python 内置 sqlite 太旧，跟系统装的那个无关 | [看 →](docs/env/Chroma需要新版sqlite.md) |
 
-### Agent 与工具设计
+### Python 与类型 `docs/python`
 
-| 现象 | 一句话原因 | 文件 |
+| 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
-| SQL 检查工具判定「通过」，实际执行却报语法错 | 纯关键字检查不验证语法，需要用 `EXPLAIN` 干跑 | [看](docs/agent/sql-check-misses-syntax-error.md) |
+| `PydanticUserError: ... non-annotated attribute` | pydantic v2 要求覆盖基类字段必须写类型注解 | [看 →](docs/python/pydantic-v2必须写类型注解.md) |
+| `string indices must be integers` | 把 `list[str]` 当成 `list[dict]` 用了 | [看 →](docs/python/把返回的列表当字典用.md) |
+| `AttributeError: ... Did you mean` | 拼写错误，报错信息里已经给了正确写法 | [看 →](docs/python/属性名拼写错误.md) |
+| `No module named 'my_llm'` | `langgraph dev` 走包路径加载，裸导入失效 | [看 →](docs/python/langgraph下模块导入失败.md) |
+| `OutputParserException: Could not parse` | 模型给 JSON 包了代码块和客套话 | [看 →](docs/python/结构化输出解析失败.md) |
+
+### Agent 与工具 `docs/agent`
+
+| 报错关键词 | 一句话原因 | 文件 |
+| --- | --- | --- |
+| `Agent stopped due to iteration limit` | 工具描述不清，模型反复调同一个工具 | [看 →](docs/agent/Agent陷入无限循环.md) |
+| 工具定义了但模型不调用 | `description` 只写了功能名，没写什么时候用 | [看 →](docs/agent/工具描述太模糊模型不调用.md) |
+| 检查通过但执行报语法错 | 纯关键字校验没验语法，要加 `EXPLAIN` 干跑 | [看 →](docs/agent/SQL检查工具查不出语法错误.md) |
+
+### RAG 与检索 `docs/rag`
+
+| 报错关键词 | 一句话原因 | 文件 |
+| --- | --- | --- |
+| `Embedding dimension xxx does not match` | 中途换了 embedding 模型，维度对不上 | [看 →](docs/rag/向量维度不匹配.md) |
+| 回答和问题无关（不报错） | 切片把答案切碎了，检索根本没命中 | [看 →](docs/rag/切分不当导致答非所问.md) |
+
+---
+
+## 按「症状」找
+
+不知道报错叫什么，只知道现象？从这儿进：
+
+| 现象 | 大概率是 |
+| --- | --- |
+| 报错里出现 `401` / `403` | 密钥或鉴权 → `docs/auth` |
+| 报错里出现 `404` | `base_url` 或模型名 → `docs/endpoint` |
+| 报错里出现 `429` | 限流 → [429限流](docs/auth/429限流.md) |
+| 报错里出现 `503` | 上游或中转站的问题 → [中转站没有可用渠道](docs/auth/中转站没有可用渠道.md) |
+| 报错里出现 `gbk` | Windows 编码 → `docs/env` |
+| 报错里出现 `pydantic` | v1/v2 版本差异 → `docs/python` |
+| 程序卡住不动、不报错 | 超时设置 → [请求挂死超时太长](docs/endpoint/请求挂死超时太长.md) |
+| 不报错，但答案不对 | 检索问题 → `docs/rag` |
+| 中文变乱码 | 编码 → [流式输出中文乱码](docs/env/流式输出中文乱码.md) |
+
+---
 
 ## 环境对照
 
-本仓库的坑主要在下面这套环境下复现：
+这些坑主要在这套环境下复现：
 
 | 组件 | 版本 |
 | --- | --- |
 | Python | 3.13 |
-| LangChain | 1.x |
-| langgraph | 最新 |
+| 操作系统 | Windows 11（中文版） |
+| langchain / langchain-core | 1.x |
 | pydantic | v2 |
-| 模型提供方 | 阿里云百炼（兼容模式）/ 智谱 / DeepSeek / 各类中转站 |
-| 操作系统 | Windows 11 |
+| chromadb | 0.5.x |
+| 用的模型 | 阿里云百炼 qwen 系列 / DeepSeek |
 
-**注意**：如果你的环境不一样，坑的表现可能不同——但根因往往一致。每条坑文件末尾都标了原始环境。
+> **同样的坑在不同版本上表现可能不同。** 如果你在别的版本上遇到不同的报错，
+> 欢迎开 Issue 补充 —— 加一条就是加一条。
 
 ## 路线图
 
-- [x] LangChain（Python）实战坑
-- [ ] LangChain4j（Java）实战坑
-- [ ] Spring AI 实战坑
-- [ ] RAG 专项：召回质量、切分参数、评估
-- [ ] Agent 专项：工具调用失败、循环终止、上下文超限
+- [x] LangChain（Python）实战踩坑 —— 24 条
+- [ ] LangChain4j / Spring AI（Java）实战踩坑 —— 进行中
+- [ ] 每条坑补「最小复现代码」
 
 ## 贡献
 
-见 [CONTRIBUTING.md](CONTRIBUTING.md)。最简单的参与方式：开一个 Issue，把你刚踩的坑贴上来（报错原文 + 你怎么解决的就行，格式我来整理）。
+见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-**这个仓库的价值等于里面坑的数量。** 你多贴一条，下一个搜到它的人就少熬一次夜。
+**最省事的方式**：提一个 [Issue](https://github.com/pgy763/llm-dev-pitfalls/issues)，把你遇到的报错原文和解决过程贴上来就行，格式我来整理。
+你的报错原文本身就有价值 —— 因为别人会搜同一句话。
 
 ## License
 
-MIT
+[MIT](LICENSE)

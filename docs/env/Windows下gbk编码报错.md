@@ -1,5 +1,7 @@
 # `UnicodeDecodeError: 'gbk' codec can't decode byte` —— Windows 上读 `.env`
 
+![报错截图](../../images/gbk-encoding.png)
+
 ## 报错
 
 ```
