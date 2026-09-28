@@ -1,18 +1,21 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-24_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-29_条-blue)
+![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
-![lang](https://img.shields.io/badge/语言-中文-orange)
+![lang](https://img.shields.io/badge/语言-中文-red)
 
 > 你在深夜遇到的那些报错，这里可能都记着。
 
-用 **LangChain / LangGraph / Chroma** 做 AI 应用时踩过的坑，**按报错关键词索引，不按学习顺序**。
+**Java 后端接大模型**时踩过的坑，**按报错关键词索引，不按学习顺序**。
+
+主攻 **Spring AI / LangChain4j / Spring Boot 3**，与 [hello-ai-backend](https://github.com/pgy763/hello-ai-backend)（写给 Java 后端工程师的 AI 接入手册）配套。也收录 LangChain（Python）的坑 —— 那是更早期踩下的，依然有效。
 
 不用从头读 —— 把报错信息复制进来，`Ctrl+F` 搜一下就行。
 
 ![示例：每条坑都配报错截图](images/pydantic-v2-annotation.png)
 
-*每条坑都带报错截图，一眼就能确认是不是同一个问题。*
+*大部分坑都带报错截图，一眼就能确认是不是同一个问题。*
 
 ---
 
@@ -22,6 +25,7 @@
 
 | | |
 | --- | --- |
+| **Java 优先** | 市面上的 AI 踩坑几乎全是 Python 的。这里优先记录 Java 生态（Spring AI / LangChain4j / Spring Boot 3）的问题 |
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
@@ -37,6 +41,16 @@
 ---
 
 ## 索引
+
+### Java 与框架集成 `docs/java` 🔥 当前主攻
+
+| 报错关键词 | 一句话原因 | 文件 |
+| --- | --- | --- |
+| `UnsupportedClassVersionError: class file version 61.0` | 编译用 JDK 17，运行用 JDK 8 | [看 →](docs/java/JDK版本不匹配.md) |
+| `No converter for [class reactor.core.publisher.FluxJust]` | MVC 项目里返回了 `Flux`，MVC 不认识它 | [看 →](docs/java/MVC项目返回Flux报错.md) |
+| `NoSuchMethodError: dev.langchain4j...` | LangChain4j 多个模块版本不一致 | [看 →](docs/java/LangChain4j模块版本不对齐.md) |
+| `UnrecognizedPropertyException: Unrecognized field` | 厂商多返回了字段，DTO 没忽略未知字段 | [看 →](docs/java/Jackson反序列化未知字段.md) |
+| 流式回答说到一半就断（不报错） | 给流式请求设了「总时长」超时 | [看 →](docs/java/流式请求设了总超时.md) |
 
 ### 密钥与鉴权 `docs/auth`
 
@@ -100,6 +114,11 @@
 
 | 现象 | 大概率是 |
 | --- | --- |
+| 报错里出现 `class file version` | JDK 版本不一致 → [JDK版本不匹配](docs/java/JDK版本不匹配.md) |
+| 报错里出现 `No converter for` / `FluxJust` | MVC 里返回了 `Flux` → [MVC项目返回Flux报错](docs/java/MVC项目返回Flux报错.md) |
+| 报错里出现 `NoSuchMethodError` | 依赖版本冲突 → [LangChain4j模块版本不对齐](docs/java/LangChain4j模块版本不对齐.md) |
+| 报错里出现 `Unrecognized field` | 厂商字段差异 → [Jackson反序列化未知字段](docs/java/Jackson反序列化未知字段.md) |
+| 回答说到一半就断、还不报错 | 流式总超时 → [流式请求设了总超时](docs/java/流式请求设了总超时.md) |
 | 报错里出现 `401` / `403` | 密钥或鉴权 → `docs/auth` |
 | 报错里出现 `404` | `base_url` 或模型名 → `docs/endpoint` |
 | 报错里出现 `429` | 限流 → [429限流](docs/auth/429限流.md) |
@@ -114,25 +133,37 @@
 
 ## 环境对照
 
-这些坑主要在这套环境下复现：
+**Java 侧**（新增条目主要在这套环境下复现）：
+
+| 组件 | 版本 |
+| --- | --- |
+| JDK | 17 / 21 |
+| Spring Boot | 3.x |
+| Spring AI | 1.x |
+| LangChain4j | 1.x |
+| 构建工具 | Maven 3.9+ |
+| 用的模型 | DeepSeek / 阿里云百炼 qwen 系列 |
+
+**Python 侧**（早期条目）：
 
 | 组件 | 版本 |
 | --- | --- |
 | Python | 3.13 |
-| 操作系统 | Windows 11（中文版） |
 | langchain / langchain-core | 1.x |
 | pydantic | v2 |
 | chromadb | 0.5.x |
-| 用的模型 | 阿里云百炼 qwen 系列 / DeepSeek |
 
-> **同样的坑在不同版本上表现可能不同。** 如果你在别的版本上遇到不同的报错，
-> 欢迎开 Issue 补充 —— 加一条就是加一条。
+> 两侧相同的环境：Windows 11（中文版）。
+> **同样的坑在不同版本上表现可能不同。** 如果你在别的版本上遇到不一样的报错，欢迎开 Issue 补充 —— 加一条就是加一条。
 
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [ ] LangChain4j / Spring AI（Java）实战踩坑 —— 进行中
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 5 条，持续补充中
+- [ ] Java 条目扩到 20 条，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
+- [ ] 给新增的 Java 条目补报错截图
+- [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
 
 ## 贡献
 
