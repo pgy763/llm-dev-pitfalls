@@ -23,10 +23,13 @@ labels: new-pitfall
 
 ## 环境版本
 
-<!-- 这一项很重要，很多坑的根因是版本差异 -->
+<!-- 这一项很重要，很多坑的根因是版本差异。Java 条目填上半张表，Python 条目填下半张。 -->
 
 | 组件 | 版本 |
 | --- | --- |
-| Python | |
-| 相关库（langchain / pydantic / ...） | |
+| JDK | |
+| Spring Boot | |
+| Spring AI / LangChain4j | |
+| 构建工具（Maven / Gradle） | |
+| Python（如果是 Python 的坑） | |
 | 操作系统 | |

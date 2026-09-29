@@ -34,7 +34,8 @@
 ## 怎么用
 
 1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**
-   （比如 `PydanticUserError`、`context_length_exceeded`、`0x80`，别搜 `error`）
+   （Java 的坑搜 `UnsupportedClassVersionError`、`NoSuchMethodError`、`No converter for`；
+   Python 的坑搜 `PydanticUserError`、`context_length_exceeded`、`0x80`。别搜 `error`）
 2. 找到对应文件，看「为什么」和「怎么改」
 3. 搜不到？[开个 Issue](https://github.com/pgy763/llm-dev-pitfalls/issues) 把报错贴上来，我来补
 
@@ -42,7 +43,9 @@
 
 ## 索引
 
-### Java 与框架集成 `docs/java` 🔥 当前主攻
+共 **29 条**：Java 生态 5 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+
+### Java 与框架集成 `docs/java` · 5 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -52,7 +55,7 @@
 | `UnrecognizedPropertyException: Unrecognized field` | 厂商多返回了字段，DTO 没忽略未知字段 | [看 →](docs/java/Jackson反序列化未知字段.md) |
 | 流式回答说到一半就断（不报错） | 给流式请求设了「总时长」超时 | [看 →](docs/java/流式请求设了总超时.md) |
 
-### 密钥与鉴权 `docs/auth`
+### 密钥与鉴权 `docs/auth` · 5 条
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -62,7 +65,7 @@
 | `429 Rate limit reached` | 循环调用超过套餐 RPM / TPM 上限 | [看 →](docs/auth/429限流.md) |
 | 🔴 `git log -S "sk-"` 有输出 | 密钥进了 git 历史，删掉当前代码也没用 | [看 →](docs/auth/密钥提交进了git历史.md) |
 
-### 接口与模型 `docs/endpoint`
+### 接口与模型 `docs/endpoint` · 4 条
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -71,7 +74,7 @@
 | `maximum context length is xxx tokens` | 对话历史不裁剪，或 RAG 检索结果塞太多 | [看 →](docs/endpoint/上下文超长.md) |
 | 请求卡住 600 秒才超时 | SDK 默认超时太长，用户干等十分钟 | [看 →](docs/endpoint/请求挂死超时太长.md) |
 
-### 环境与编码 `docs/env`
+### 环境与编码 `docs/env` · 5 条
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -81,7 +84,7 @@
 | 流式输出中文变 `锟斤拷` | 终端或 Python 输出编码不是 UTF-8 | [看 →](docs/env/流式输出中文乱码.md) |
 | `Chroma requires sqlite3 >= 3.35.0` | Python 内置 sqlite 太旧，跟系统装的那个无关 | [看 →](docs/env/Chroma需要新版sqlite.md) |
 
-### Python 与类型 `docs/python`
+### Python 与类型 `docs/python` · 5 条（早期条目，不再新增）
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -91,7 +94,7 @@
 | `No module named 'my_llm'` | `langgraph dev` 走包路径加载，裸导入失效 | [看 →](docs/python/langgraph下模块导入失败.md) |
 | `OutputParserException: Could not parse` | 模型给 JSON 包了代码块和客套话 | [看 →](docs/python/结构化输出解析失败.md) |
 
-### Agent 与工具 `docs/agent`
+### Agent 与工具 `docs/agent` · 3 条
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -99,7 +102,7 @@
 | 工具定义了但模型不调用 | `description` 只写了功能名，没写什么时候用 | [看 →](docs/agent/工具描述太模糊模型不调用.md) |
 | 检查通过但执行报语法错 | 纯关键字校验没验语法，要加 `EXPLAIN` 干跑 | [看 →](docs/agent/SQL检查工具查不出语法错误.md) |
 
-### RAG 与检索 `docs/rag`
+### RAG 与检索 `docs/rag` · 2 条
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -154,15 +157,16 @@
 | chromadb | 0.5.x |
 
 > 两侧相同的环境：Windows 11（中文版）。
+> Spring AI 与 LangChain4j 都还在快速迭代，版本号以官方最新文档为准 —— 这里只标大版本。
 > **同样的坑在不同版本上表现可能不同。** 如果你在别的版本上遇到不一样的报错，欢迎开 Issue 补充 —— 加一条就是加一条。
 
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 5 条，持续补充中
-- [ ] Java 条目扩到 20 条，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 5 条
+- [ ] Java 条目扩到 20 条 —— 当前 **5 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
-- [ ] 给新增的 Java 条目补报错截图
+- [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
 
 ## 贡献
