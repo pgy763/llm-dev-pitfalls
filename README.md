@@ -1,6 +1,6 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-29_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-30_条-blue)
 ![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![lang](https://img.shields.io/badge/语言-中文-red)
@@ -43,9 +43,9 @@
 
 ## 索引
 
-共 **29 条**：Java 生态 5 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+共 **30 条**：Java 生态 6 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
 
-### Java 与框架集成 `docs/java` · 5 条 🔥 当前主攻
+### Java 与框架集成 `docs/java` · 6 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -54,6 +54,7 @@
 | `NoSuchMethodError: dev.langchain4j...` | LangChain4j 多个模块版本不一致 | [看 →](docs/java/LangChain4j模块版本不对齐.md) |
 | `UnrecognizedPropertyException: Unrecognized field` | 厂商多返回了字段，DTO 没忽略未知字段 | [看 →](docs/java/Jackson反序列化未知字段.md) |
 | 流式回答说到一半就断（不报错） | 给流式请求设了「总时长」超时 | [看 →](docs/java/流式请求设了总超时.md) |
+| `InvalidDefinitionException: Java 8 date/time type ...` | 自己 `new` 的 `ObjectMapper` 没注册 `JavaTimeModule` | [看 →](docs/java/自定义ObjectMapper不认时间类型.md) |
 
 ### 密钥与鉴权 `docs/auth` · 5 条
 
@@ -121,6 +122,8 @@
 | 报错里出现 `No converter for` / `FluxJust` | MVC 里返回了 `Flux` → [MVC项目返回Flux报错](docs/java/MVC项目返回Flux报错.md) |
 | 报错里出现 `NoSuchMethodError` | 依赖版本冲突 → [LangChain4j模块版本不对齐](docs/java/LangChain4j模块版本不对齐.md) |
 | 报错里出现 `Unrecognized field` | 厂商字段差异 → [Jackson反序列化未知字段](docs/java/Jackson反序列化未知字段.md) |
+| 报错里出现 `Java 8 date/time type` / `jsr310` | 你用的不是 Spring 那个 `ObjectMapper` → [自定义ObjectMapper不认时间类型](docs/java/自定义ObjectMapper不认时间类型.md) |
+| `LocalDateTime` 被序列化成数组 `[2026,9,30,...]` | `WRITE_DATES_AS_TIMESTAMPS` 没关 → [自定义ObjectMapper不认时间类型](docs/java/自定义ObjectMapper不认时间类型.md) |
 | 回答说到一半就断、还不报错 | 流式总超时 → [流式请求设了总超时](docs/java/流式请求设了总超时.md) |
 | 报错里出现 `401` / `403` | 密钥或鉴权 → `docs/auth` |
 | 报错里出现 `404` | `base_url` 或模型名 → `docs/endpoint` |
@@ -163,8 +166,8 @@
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 5 条
-- [ ] Java 条目扩到 20 条 —— 当前 **5 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 6 条
+- [ ] Java 条目扩到 20 条 —— 当前 **6 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
 - [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
