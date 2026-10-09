@@ -1,6 +1,6 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-30_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-31_条-blue)
 ![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![lang](https://img.shields.io/badge/语言-中文-red)
@@ -29,7 +29,7 @@
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
-| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了，Java 的 6 条正在补 |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了，Java 的 7 条正在补 |
 
 ## 怎么用
 
@@ -43,9 +43,9 @@
 
 ## 索引
 
-共 **30 条**：Java 生态 6 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+共 **31 条**：Java 生态 7 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
 
-### Java 与框架集成 `docs/java` · 6 条 🔥 当前主攻
+### Java 与框架集成 `docs/java` · 7 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -55,6 +55,7 @@
 | `UnrecognizedPropertyException: Unrecognized field` | 厂商多返回了字段，DTO 没忽略未知字段 | [看 →](docs/java/Jackson反序列化未知字段.md) |
 | 流式回答说到一半就断（不报错） | 给流式请求设了「总时长」超时 | [看 →](docs/java/流式请求设了总超时.md) |
 | `InvalidDefinitionException: Java 8 date/time type ...` | 自己 `new` 的 `ObjectMapper` 没注册 `JavaTimeModule` | [看 →](docs/java/自定义ObjectMapper不认时间类型.md) |
+| `TaskRejectedException` / `RejectedExecutionException` | 并发调模型把线程池打满（默认池队列还是无界的） | [看 →](docs/java/并发调用模型把线程池打满.md) |
 
 ### 密钥与鉴权 `docs/auth` · 5 条
 
@@ -125,6 +126,8 @@
 | 报错里出现 `Java 8 date/time type` / `jsr310` | 你用的不是 Spring 那个 `ObjectMapper` → [自定义ObjectMapper不认时间类型](docs/java/自定义ObjectMapper不认时间类型.md) |
 | `LocalDateTime` 被序列化成数组 `[2026,9,30,...]` | `WRITE_DATES_AS_TIMESTAMPS` 没关 → [自定义ObjectMapper不认时间类型](docs/java/自定义ObjectMapper不认时间类型.md) |
 | 回答说到一半就断、还不报错 | 流式总超时 → [流式请求设了总超时](docs/java/流式请求设了总超时.md) |
+| 接口集体变慢、队列一直涨、CPU 却不高（不报错） | 并发调模型把线程池打满 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
+| 报错里出现 `RejectedExecutionException` | 线程池拒绝任务 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
 | 报错里出现 `401` / `403` | 密钥或鉴权 → `docs/auth` |
 | 报错里出现 `404` | `base_url` 或模型名 → `docs/endpoint` |
 | 报错里出现 `429` | 限流 → [429限流](docs/auth/429限流.md) |
@@ -168,8 +171,8 @@
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 6 条
-- [ ] Java 条目扩到 20 条 —— 当前 **6 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 7 条
+- [ ] Java 条目扩到 20 条 —— 当前 **7 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
 - [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
