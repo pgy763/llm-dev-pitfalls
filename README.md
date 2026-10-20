@@ -29,7 +29,7 @@
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
-| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了，Java 的 11 条正在补 |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 11 条还没配（在路线图里） |
 
 ## 怎么用
 
@@ -131,7 +131,7 @@
 | `LocalDateTime` 被序列化成数组 `[2026,9,30,...]` | `WRITE_DATES_AS_TIMESTAMPS` 没关 → [自定义ObjectMapper不认时间类型](docs/java/自定义ObjectMapper不认时间类型.md) |
 | 回答说到一半就断、还不报错 | 流式总超时 → [流式请求设了总超时](docs/java/流式请求设了总超时.md) |
 | 接口集体变慢、队列一直涨、CPU 却不高（不报错） | 并发调模型把线程池打满 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
-| 报错里出现 `RejectedExecutionException` | 线程池拒绝任务 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
+| 报错里出现 `RejectedExecutionException` / `TaskRejectedException` | 线程池拒绝任务，等待队列也满了 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
 | 本地直连逐字出、挂上 Nginx 后整段一次性到达（不报错） | 反代在缓冲流式响应 → [Nginx缓冲导致流式失效](docs/java/Nginx缓冲导致流式失效.md) |
 | 报错里出现 `upstream timed out` / `ERR_INCOMPLETE_CHUNKED_ENCODING` | 网关读超时或缓冲 → [Nginx缓冲导致流式失效](docs/java/Nginx缓冲导致流式失效.md) |
 | 日志出现 `multiple SLF4J bindings` / 日志格式突然不对、`logging.level` 失效（不报错） | classpath 上有第二个日志实现 → [多个SLF4J绑定](docs/java/多个SLF4J绑定.md) |
