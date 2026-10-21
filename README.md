@@ -1,6 +1,6 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-35_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-36_条-blue)
 ![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![lang](https://img.shields.io/badge/语言-中文-red)
@@ -29,7 +29,7 @@
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
-| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 11 条还没配（在路线图里） |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 12 条还没配（在路线图里） |
 
 ## 怎么用
 
@@ -43,9 +43,9 @@
 
 ## 索引
 
-共 **35 条**：Java 生态 11 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+共 **36 条**：Java 生态 12 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
 
-### Java 与框架集成 `docs/java` · 11 条 🔥 当前主攻
+### Java 与框架集成 `docs/java` · 12 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -60,6 +60,7 @@
 | `SLF4J: Class path contains multiple SLF4J bindings` | 引入的库顺手带进第二个日志实现，SLF4J 挑实现靠 classpath 顺序 | [看 →](docs/java/多个SLF4J绑定.md) |
 | `NoClassDefFoundError: javax/servlet/http/HttpServletRequest` | 引了为 Boot 2 编译的 starter，Boot 3 只认 `jakarta.servlet` | [看 →](docs/java/SpringBoot3的javax与jakarta.md) |
 | `AsyncRequestTimeoutException` · SSE 连 30 秒就断 | `SseEmitter` 没设超时，用了容器 30 秒的 async 默认值 | [看 →](docs/java/SSE连接30秒断开.md) |
+| `IllegalStateException: block()/blockFirst()/blockLast() are blocking` | 在 WebFlux 的 IO 线程上把流收集成整段 | [看 →](docs/java/WebFlux里block流式结果.md) |
 
 ### 密钥与鉴权 `docs/auth` · 5 条
 
@@ -139,6 +140,8 @@
 | 编译期报「程序包 javax.servlet 不存在」 | 抄了 Boot 2 的代码，包名已改 `jakarta` → [SpringBoot3的javax与jakarta](docs/java/SpringBoot3的javax与jakarta.md) |
 | SSE 连上后固定 30 秒断开，前端自动重连（不报错） | `SseEmitter` 用了容器默认超时 → [SSE连接30秒断开](docs/java/SSE连接30秒断开.md) |
 | 报错里出现 `AsyncRequestTimeoutException` / `ResponseBodyEmitter has already completed` | 连接已被超时关掉，还在往里写 → [SSE连接30秒断开](docs/java/SSE连接30秒断开.md) |
+| 报错里出现 `block()/blockFirst()/blockLast() are blocking` | 在 Reactor 非阻塞线程上调了 `block()` → [WebFlux里block流式结果](docs/java/WebFlux里block流式结果.md) |
+| WebFlux 服务并发一高整体卡住、健康检查也超时（不一定报错） | IO 线程里做了阻塞调用，或 `boundedElastic` 被打满 → [WebFlux里block流式结果](docs/java/WebFlux里block流式结果.md) |
 | 报错里出现 `401` / `403` | 密钥或鉴权 → `docs/auth` |
 | 报错里出现 `404` | `base_url` 或模型名 → `docs/endpoint` |
 | 报错里出现 `429` | 限流 → [429限流](docs/auth/429限流.md) |
@@ -182,8 +185,8 @@
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 11 条
-- [ ] Java 条目扩到 20 条 —— 当前 **11 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 12 条
+- [ ] Java 条目扩到 20 条 —— 当前 **12 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
 - [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
