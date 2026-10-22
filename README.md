@@ -33,9 +33,13 @@
 
 ## 怎么用
 
-1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**
-   （Java 的坑搜 `UnsupportedClassVersionError`、`NoSuchMethodError`、`No converter for`、`upstream timed out`、`multiple SLF4J`、`javax.servlet`、`AsyncRequestTimeoutException`；
-   Python 的坑搜 `PydanticUserError`、`context_length_exceeded`、`0x80`。别搜 `error`）
+1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**。Java 的坑按「错在哪一层」分四类，对着你那句报错挑：
+   - **依赖 / 编译层**：`NoSuchMethodError`、`multiple SLF4J`、`javax.servlet`、`UnsupportedClassVersionError`
+   - **协议 / 序列化层**：`No converter for`、`Unrecognized field`、`Java 8 date/time type`
+   - **流式 / 并发层**：`block()/blockFirst()`、`RejectedExecutionException`、`AsyncRequestTimeoutException`
+   - **部署 / 网关层**：`upstream timed out`、`ERR_INCOMPLETE_CHUNKED_ENCODING`、`proxy_buffering`
+
+   Python 的坑搜 `PydanticUserError`、`context_length_exceeded`、`0x80`。别搜 `error` —— 每条都有。
 2. 找到对应文件，看「为什么」和「怎么改」
 3. 搜不到？[开个 Issue](https://github.com/pgy763/llm-dev-pitfalls/issues) 把报错贴上来，我来补
 
