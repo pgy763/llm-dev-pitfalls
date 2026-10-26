@@ -1,6 +1,6 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-37_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-38_条-blue)
 ![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![lang](https://img.shields.io/badge/语言-中文-red)
@@ -29,7 +29,7 @@
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
-| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 13 条还没配（在路线图里） |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 14 条还没配（在路线图里） |
 
 ## 怎么用
 
@@ -37,7 +37,7 @@
    - **依赖 / 编译层**：`NoSuchMethodError`、`LinkageError`、`multiple SLF4J`、`javax.servlet`、`UnsupportedClassVersionError`
    - **协议 / 序列化层**：`No converter for`、`Unrecognized field`、`Java 8 date/time type`
    - **流式 / 并发层**：`block()/blockFirst()`、`RejectedExecutionException`、`AsyncRequestTimeoutException`
-   - **部署 / 网关层**：`upstream timed out`、`ERR_INCOMPLETE_CHUNKED_ENCODING`、`proxy_buffering`
+   - **部署 / 网关层**：`upstream timed out`、`ERR_INCOMPLETE_CHUNKED_ENCODING`、`proxy_buffering`、`413 Request Entity Too Large`
 
    Python 的坑搜 `PydanticUserError`、`context_length_exceeded`、`0x80`。别搜 `error` —— 每条都有。
 2. 找到对应文件，看「为什么」和「怎么改」
@@ -47,9 +47,9 @@
 
 ## 索引
 
-共 **37 条**：Java 生态 13 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+共 **38 条**：Java 生态 14 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
 
-### Java 与框架集成 `docs/java` · 13 条 🔥 当前主攻
+### Java 与框架集成 `docs/java` · 14 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -66,6 +66,7 @@
 | `AsyncRequestTimeoutException` · SSE 连 30 秒就断 | `SseEmitter` 没设超时，用了容器 30 秒的 async 默认值 | [看 →](docs/java/SSE连接30秒断开.md) |
 | `IllegalStateException: block()/blockFirst()/blockLast() are blocking` | 在 WebFlux 的 IO 线程上把流收集成整段 | [看 →](docs/java/WebFlux里block流式结果.md) |
 | `LinkageError: loader constraint violation ... for a different type` | classpath 上两份同一个库，JVM 链接时对不上 | [看 →](docs/java/classpath上两份同一个库.md) |
+| `413 Request Entity Too Large` · `MaxUploadSizeExceededException` | Nginx 与 Spring 各有一个 1 MB 上传默认值，先撞谁看部署 | [看 →](docs/java/上传文档报413.md) |
 
 ### 密钥与鉴权 `docs/auth` · 5 条
 
@@ -191,8 +192,8 @@
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 13 条
-- [ ] Java 条目扩到 20 条 —— 当前 **13 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 14 条
+- [ ] Java 条目扩到 20 条 —— 当前 **14 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
 - [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
