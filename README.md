@@ -142,6 +142,8 @@
 | 报错里出现 `RejectedExecutionException` / `TaskRejectedException` | 线程池拒绝任务，等待队列也满了 → [并发调用模型把线程池打满](docs/java/并发调用模型把线程池打满.md) |
 | 本地直连逐字出、挂上 Nginx 后整段一次性到达（不报错） | 反代在缓冲流式响应 → [Nginx缓冲导致流式失效](docs/java/Nginx缓冲导致流式失效.md) |
 | 报错里出现 `upstream timed out` / `ERR_INCOMPLETE_CHUNKED_ENCODING` | 网关读超时或缓冲 → [Nginx缓冲导致流式失效](docs/java/Nginx缓冲导致流式失效.md) |
+| 上传文件时返回一段 Nginx 的 HTML 错误页，应用日志里搜不到这条请求 | 请求体在代理层就被拒了 → [上传文档报413](docs/java/上传文档报413.md) |
+| 上传直接 500，报错里出现 `MaxUploadSizeExceededException` / `FileSizeLimitExceededException` | 撞的是 Spring 那层 multipart 上限，跟 Nginx 无关 → [上传文档报413](docs/java/上传文档报413.md) |
 | 日志出现 `multiple SLF4J bindings` / 日志格式突然不对、`logging.level` 失效（不报错） | classpath 上有第二个日志实现 → [多个SLF4J绑定](docs/java/多个SLF4J绑定.md) |
 | 报错里出现 `javax/servlet` / `javax.servlet` | Boot 3 下引了 Boot 2 时代的 starter → [SpringBoot3的javax与jakarta](docs/java/SpringBoot3的javax与jakarta.md) |
 | 编译期报「程序包 javax.servlet 不存在」 | 抄了 Boot 2 的代码，包名已改 `jakarta` → [SpringBoot3的javax与jakarta](docs/java/SpringBoot3的javax与jakarta.md) |
