@@ -33,8 +33,9 @@
 
 ## 怎么用
 
-1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**。Java 的坑按「错在哪一层」分四类，对着你那句报错挑：
+1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**。Java 的坑按「错在哪一层」分五类，对着你那句报错挑：
    - **依赖 / 编译层**：`NoSuchMethodError`、`LinkageError`、`multiple SLF4J`、`javax.servlet`、`UnsupportedClassVersionError`
+   - **配置 / 装配层**：`NoSuchBeanDefinitionException`、`NoUniqueBeanDefinitionException`、报错里出现 `ChatClient`
    - **协议 / 序列化层**：`No converter for`、`Unrecognized field`、`Java 8 date/time type`
    - **流式 / 并发层**：`block()/blockFirst()`、`RejectedExecutionException`、`AsyncRequestTimeoutException`
    - **部署 / 网关层**：`upstream timed out`、`ERR_INCOMPLETE_CHUNKED_ENCODING`、`proxy_buffering`、`413 Request Entity Too Large`
