@@ -1,6 +1,6 @@
 # LLM 应用开发踩坑手册
 
-![pitfalls](https://img.shields.io/badge/收录踩坑-39_条-blue)
+![pitfalls](https://img.shields.io/badge/收录踩坑-40_条-blue)
 ![java](https://img.shields.io/badge/主攻-Java_接大模型-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![lang](https://img.shields.io/badge/语言-中文-red)
@@ -29,13 +29,13 @@
 | **按报错索引** | 你手上只有报错，没有章节号。所以文件名就是症状，索引表就是搜索入口 |
 | **四段固定结构** | 报错原文 / 为什么 / 怎么改 / 怎么预防。看完知道怎么修，也知道下次怎么躲 |
 | **标了环境版本** | 大部分坑的根因是版本差异。不标版本的坑等于没写 |
-| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 15 条还没配（在路线图里） |
+| **配报错截图** | 不用读文字，扫一眼截图就知道是不是同一个错。早期 24 条全配了；Java 这 16 条还没配（在路线图里） |
 
 ## 怎么用
 
 1. 把报错信息复制进来，`Ctrl+F` 搜**最独特的那个词**。Java 的坑按「错在哪一层」分五类，对着你那句报错挑：
    - **依赖 / 编译层**：`NoSuchMethodError`、`LinkageError`、`multiple SLF4J`、`javax.servlet`、`UnsupportedClassVersionError`
-   - **配置 / 装配层**：`NoSuchBeanDefinitionException`、`NoUniqueBeanDefinitionException`、报错里出现 `ChatClient`
+   - **配置 / 装配层**：`NoSuchBeanDefinitionException`、`NoUniqueBeanDefinitionException`、报错里出现 `ChatClient`、`@MemoryId`
    - **协议 / 序列化层**：`No converter for`、`Unrecognized field`、`Java 8 date/time type`
    - **流式 / 并发层**：`block()/blockFirst()`、`RejectedExecutionException`、`AsyncRequestTimeoutException`
    - **部署 / 网关层**：`upstream timed out`、`ERR_INCOMPLETE_CHUNKED_ENCODING`、`proxy_buffering`、`413 Request Entity Too Large`
@@ -48,9 +48,9 @@
 
 ## 索引
 
-共 **39 条**：Java 生态 15 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
+共 **40 条**：Java 生态 16 条（持续补充），其余 24 条是早期 LangChain / Python 阶段踩下的。
 
-### Java 与框架集成 `docs/java` · 15 条 🔥 当前主攻
+### Java 与框架集成 `docs/java` · 16 条 🔥 当前主攻
 
 | 报错关键词 | 一句话原因 | 文件 |
 | --- | --- | --- |
@@ -69,6 +69,7 @@
 | `LinkageError: loader constraint violation ... for a different type` | classpath 上两份同一个库，JVM 链接时对不上 | [看 →](docs/java/classpath上两份同一个库.md) |
 | `413 Request Entity Too Large` · `MaxUploadSizeExceededException` | Nginx 与 Spring 各有一个 1 MB 上传默认值，先撞谁看部署 | [看 →](docs/java/上传文档报413.md) |
 | `NoSuchBeanDefinitionException` 里出现 `ChatClient` | Spring AI 只自动配置 `ChatClient.Builder`，`ChatClient` 得自己声明 | [看 →](docs/java/注入ChatClient找不到Bean.md) |
+| 回答里出现别人的提问（不报错） · `@MemoryId` | 单例 `Assistant` 共用一份 `ChatMemory`，所有用户挤同一个窗口 | [看 →](docs/java/多用户共用一份ChatMemory.md) |
 
 ### 密钥与鉴权 `docs/auth` · 5 条
 
@@ -151,6 +152,9 @@
 | 编译期报「程序包 javax.servlet 不存在」 | 抄了 Boot 2 的代码，包名已改 `jakarta` → [SpringBoot3的javax与jakarta](docs/java/SpringBoot3的javax与jakarta.md) |
 | 启动就失败，`NoSuchBeanDefinitionException` 里带 `ChatClient` | Spring AI 没给 `ChatClient` 单例，只给了 `Builder` → [注入ChatClient找不到Bean](docs/java/注入ChatClient找不到Bean.md) |
 | 启动报 `NoUniqueBeanDefinitionException`，`found 2: ...ChatClientBuilder` | 两个模型 starter 各注册了一个 Builder → [注入ChatClient找不到Bean](docs/java/注入ChatClient找不到Bean.md) |
+| 回答里出现其他用户问过的内容（不报错） | 单例 `Assistant` 共用一份 `ChatMemory` → [多用户共用一份ChatMemory](docs/java/多用户共用一份ChatMemory.md) |
+| 对话越长 `prompt_tokens` 涨得越快、账单超预期（不报错） | 历史按「条数」而不是 token 限额，且被多个用户共享 → [多用户共用一份ChatMemory](docs/java/多用户共用一份ChatMemory.md) |
+| 多实例部署后模型「突然忘了刚才说什么」（不报错） | `ChatMemory` 存在进程内存里，请求落到另一台 → [多用户共用一份ChatMemory](docs/java/多用户共用一份ChatMemory.md) |
 | SSE 连上后固定 30 秒断开，前端自动重连（不报错） | `SseEmitter` 用了容器默认超时 → [SSE连接30秒断开](docs/java/SSE连接30秒断开.md) |
 | 报错里出现 `AsyncRequestTimeoutException` / `ResponseBodyEmitter has already completed` | 连接已被超时关掉，还在往里写 → [SSE连接30秒断开](docs/java/SSE连接30秒断开.md) |
 | 报错里出现 `block()/blockFirst()/blockLast() are blocking` | 在 Reactor 非阻塞线程上调了 `block()` → [WebFlux里block流式结果](docs/java/WebFlux里block流式结果.md) |
@@ -198,8 +202,8 @@
 ## 路线图
 
 - [x] LangChain（Python）实战踩坑 —— 24 条
-- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 15 条
-- [ ] Java 条目扩到 20 条 —— 当前 **15 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
+- [x] **转向 Java 生态**（Spring AI / LangChain4j / Spring Boot 3）—— 16 条
+- [ ] Java 条目扩到 20 条 —— 当前 **16 / 20**，按「接口调用 / 流式 / 依赖 / 部署」分类整理
 - [ ] 每条坑补「最小复现代码」
 - [ ] 给新增的 Java 条目补报错截图（现有 Java 条目都还没配图）
 - [ ] 配套项目：[hello-ai-backend](https://github.com/pgy763/hello-ai-backend) —— 写给 Java 后端工程师的 AI 接入手册
