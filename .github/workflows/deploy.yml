@@ -3,7 +3,7 @@ name: Deploy docs to GitHub Pages
 on:
   push:
     branches: [main]
-  # PR 也构建：死链、坏 frontmatter、组件语法错，都要在合并前发现
+  # PR 只构建：死链、坏 frontmatter、组件语法错，都要在合并前发现
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -30,17 +30,18 @@ jobs:
           node-version: 22
           cache: npm
 
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - run: npm ci
 
-      # gen-index 会重新生成分类页和 /all 的索引 JSON，
-      # 所以新加一篇 md 不用改配置，构建时会自动进侧边栏和搜索结果
+      # gen-index 会重新生成分类页和 /all 用的索引 JSON。
+      # 所以新增一篇 md 不用改配置 —— 侧边栏、分类页、搜索三处同时生效。
+      # 顺带一提：这一步也会在死链、坏 frontmatter 上直接失败。
       - run: npm run docs:build
 
-      - uses: actions/upload-pages-artifact@v3
+      # Pages 站点在仓库设置里已启用（build_type=workflow）。
+      # 这里不再跑 configure-pages：它需要仓库管理权限，
+      # 用 GITHUB_TOKEN 在 PR 上拿不到，会让整个构建误报失败。
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
 
